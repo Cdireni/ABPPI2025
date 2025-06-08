@@ -1,7 +1,7 @@
 
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid
-} from 'recharts';
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, PieChart, Pie,
+  Cell, Legend} from 'recharts';
 import React from 'react';
 
 function StatsPanel({ products }) {
@@ -57,6 +57,28 @@ const dataBarras = Object.entries(productosPorCategoria).map(([categoria, cantid
   cantidad
 }));
 
+// Datos para línea de evolución de precios (simulados)
+const priceEvolution = products.slice(0, 10).map((p, i) => ({
+  name: `P${i + 1}`,
+  price: p.price + Math.floor(Math.random() * 20) - 10, // simulación con variación aleatoria
+}));
+
+// Datos para pie chart de stock
+const stockRanges = {
+  bajo: products.filter(p => p.stock <= 20).length,
+  medio: products.filter(p => p.stock > 20 && p.stock <= 50).length,
+  alto: products.filter(p => p.stock > 50).length,
+};
+
+const pieData = [
+  { name: 'Stock bajo (≤20)', value: stockRanges.bajo },
+  { name: 'Stock medio (21–50)', value: stockRanges.medio },
+  { name: 'Stock alto (>50)', value: stockRanges.alto },
+];
+
+const COLORS = ['#FF8042', '#FFBB28', '#00C49F'];
+
+
   return (
     <div className="my-8 p-4 bg-gray-100 rounded shadow text-left max-w-xl mx-auto transition-opacity duration-500 animate-fade-in dark:bg-gray-800 dark:text-white">
       <h3 className="text-2xl font-semibold mb-4">Estadísticas</h3>
@@ -103,6 +125,41 @@ const dataBarras = Object.entries(productosPorCategoria).map(([categoria, cantid
           );
         })}
       </ul>
+
+      {/* Gráfico de líneas: evolución de precios */}
+      <h4 className="text-xl font-semibold mt-8 text-gray-800">Evolución de Precios (simulada)</h4>
+      <ResponsiveContainer width="100%" height={250}>
+        <LineChart data={priceEvolution}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Line type="monotone" dataKey="price" stroke="#8884d8" strokeWidth={2} />
+        </LineChart>
+      </ResponsiveContainer>
+
+      {/* Pie chart: proporción de productos según stock */}
+      <h4 className="text-xl font-semibold mt-8 text-gray-800">Distribución de Stock</h4>
+      <ResponsiveContainer width="100%" height={300}>
+        <PieChart>
+          <Pie
+            data={pieData}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={100}
+            fill="#8884d8"
+            label
+          >
+            {pieData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+
     </div>
   );
 }
