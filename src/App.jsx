@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css';
-import StatsPanel from './StatsPanel';
+import StatsPanel from './components/StatsPanel.jsx';
 import ProductList from './components/ProductList';
+import { useState, useEffect } from 'react';
+
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -11,6 +12,39 @@ function App() {
   const [sortOption, setSortOption] = useState(""); // e.g. 'price-asc'
   const [darkMode, setDarkMode] = useState(false);
   const [showStats, setShowStats] = useState(false);
+
+   const exportJSON = () => {
+    const dataStr = JSON.stringify(filteredProducts, null, 2);
+    const blob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'productos_filtrados.json';
+    a.click();
+    URL.revokeObjectURL(url);
+    alert('Archivo JSON descargado');
+  };
+
+  const exportCSV = () => {
+    if (!filteredProducts.length) return;
+
+    const keys = Object.keys(filteredProducts[0]);
+    const csvRows = [
+      keys.join(","), // encabezados
+      ...filteredProducts.map(product =>
+        keys.map(k => `"${String(product[k]).replace(/"/g, '""')}"`).join(",")
+      ),
+    ];
+
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "productos_filtrados.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+    alert("Archivo CSV descargado");
+  };
   
 
   const toggleDarkMode = () => {
@@ -18,11 +52,11 @@ function App() {
     document.documentElement.classList.toggle("dark");
   };
 
-  useEffect(() => {
-    axios.get('https://dummyjson.com/products?limit=100')
-      .then((res) => {
-        setProducts(res.data.products);
-      });
+   useEffect(() => {
+    fetch('https://dummyjson.com/products')
+      .then(res => res.json())
+      .then(data => setProducts(data.products))
+      .catch(err => console.error('Error fetching products:', err));
   }, []);
 
   //extraer categorías únicas
@@ -107,6 +141,17 @@ function App() {
 
         {showStats && <StatsPanel products={filteredProducts} />}
         <ProductList products={filteredProducts} />
+
+        {/* Botones exportar */}
+      <div className="mb-4 space-x-4">
+        <button onClick={exportJSON} className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded shadow">
+          Exportar JSON
+        </button>
+        <button onClick={exportCSV} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-4 py-2 rounded shadow">
+          Exportar CSV
+        </button>
+      </div>
+
       </div>
     </>
   );
