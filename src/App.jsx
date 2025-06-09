@@ -1,9 +1,10 @@
-
 import axios from 'axios';
 import './App.css';
 import StatsPanel from './components/StatsPanel.jsx';
 import ProductList from './components/ProductList';
 import { useState, useEffect } from 'react';
+import ExportButtons from './components/ExportButtons';
+
 
 
 function App() {
@@ -13,8 +14,13 @@ function App() {
   const [sortOption, setSortOption] = useState(""); // e.g. 'price-asc'
   const [darkMode, setDarkMode] = useState(false);
   const [showStats, setShowStats] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [visibleCount, setVisibleCount] = useState(10);
+
+ 
+  const loadMore = () => {
+  setVisibleCount(prev => prev + 10);
+};
+
 
    const exportJSON = () => {
     const dataStr = JSON.stringify(filteredProducts, null, 2);
@@ -55,11 +61,7 @@ function App() {
     document.documentElement.classList.toggle("dark");
   };
 
-   useEffect(() => {
-    setCurrentPage(1); // Reinicia la página cuando cambian filtros
-  }, [search, categoryFilter, sortOption]);
-
-   useEffect(() => {
+    useEffect(() => {
     fetch('https://dummyjson.com/products')
       .then(res => res.json())
       .then(data => setProducts(data.products))
@@ -87,22 +89,10 @@ function App() {
   } else if (sortOption === "rating-desc") {
     filteredProducts.sort((a, b) => b.rating - a.rating);
   }
+  //azy loading
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
 
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const paginatedProducts = filteredProducts.slice(
-  (currentPage - 1) * itemsPerPage,
-  currentPage * itemsPerPage
-);
-
-const nextPage = () => {
-  if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-};
-
-const prevPage = () => {
-  if (currentPage > 1) setCurrentPage(currentPage - 1);
-};
-
-
+ 
   return (
     <>
       <h1>Proyecto ABP: Procesamiento de datos con APIS REST</h1>
@@ -161,33 +151,24 @@ const prevPage = () => {
         </button>
 
         {showStats && <StatsPanel products={filteredProducts} />}
-        <ProductList products={paginatedProducts} />
-
-      <div className="flex justify-center items-center mt-4 space-x-4">
-        <button
-          onClick={prevPage}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50">Anterior
-        </button>
-        <span className="text-lg font-semibold">Página {currentPage} de {totalPages}</span>
-        <button
-          onClick={nextPage}
-          disabled={currentPage === totalPages}
-          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50">Siguiente
-        </button>
-      </div>
+        <ProductList products={visibleProducts} />
+        {visibleCount < filteredProducts.length && (
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={loadMore}
+            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+          >
+            Cargar más productos
+          </button>
+        </div>
+        )}
 
 
 
-        {/* Botones exportar */}
-      <div className="mb-4 space-x-4">
-        <button onClick={exportJSON} className="bg-green-600 hover:bg-green-700 text-white font-bold px-4 py-2 rounded shadow">
-          Exportar JSON
-        </button>
-        <button onClick={exportCSV} className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-4 py-2 rounded shadow">
-          Exportar CSV
-        </button>
-      </div>
+        <ExportButtons onExportJSON={exportJSON} onExportCSV={exportCSV} />
+
+        
+
 
       </div>
     </>
@@ -195,3 +176,4 @@ const prevPage = () => {
 }
 
 export default App;
+
