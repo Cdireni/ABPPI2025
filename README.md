@@ -16,9 +16,11 @@ Este proyecto es una práctica de desarrollo web con:
 
 bash
 npm install
+
 3. Inicia el servidor de desarrollo:
 
 bash
 npm run dev
+
 4. Abre tu navegador en la URL que aparece en la terminal:
 🔗 Ejemplo: http://localhost:5173
