@@ -69,7 +69,7 @@ function App() {
   };
 
     useEffect(() => {
-    axios.get('https://dummyjson.com/products')
+    axios.get('https://dummyjson.com/products?=limit=100') // api de products
       .then(res => res.json())
       .then(data => setProducts(data.products))
       .catch(err => console.error('Error fetching products:', err));
