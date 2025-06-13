@@ -69,7 +69,7 @@ function App() {
   }, []);
 
   //extraer categorías únicas
-  const uniqueCategories = [...new Set(products.map(p => p.category))].sort();
+  const uniqueCategories = [...new Set(products.map(p => p.category))].sort(); //para renderizar opc de cat
 
   // filtrado inicial por búsqueda y categoría
 
@@ -110,7 +110,7 @@ function App() {
           placeholder="Buscar producto..."
           className="border rounded px-3 py-2 my-4 w-full max-w-md dark:bg-gray-800 dark:text-white"
           value={search}
-          onChange={e => setSearch(e.target.value)}
+          onChange={e => setSearch(e.target.value)} //como callback del evento
         />
 
         {/* Mostrar select solo si hay productos cargados */}
@@ -119,7 +119,7 @@ function App() {
         <select 
           className="border rounded px-3 py-2 mr-4 mb-4 dark:bg-gray-800 dark:text-white"
           value={categoryFilter}
-          onChange={e => setCategoryFilter(e.target.value)}
+          onChange={e => setCategoryFilter(e.target.value)} 
         >
           {["all",...uniqueCategories].map(cat => (
             <option key={cat} value={cat}>
