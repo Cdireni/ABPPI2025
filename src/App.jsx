@@ -1,14 +1,15 @@
 import axios from 'axios';
 import './App.css';
-import StatsPanel from './components/StatsPanel.jsx';
-import ProductList from './components/ProductList';
-import { useState, useEffect, useRef } from 'react';
-import ExportButtons from './components/ExportButtons';
+import StatsPanel from './components/StatsPanel.jsx'; // componente para mostrar estadisticas
+import ProductList from './components/ProductList'; // lista de productos
+import { useState, useEffect, useRef } from 'react'; // hooks de react manejo de estados y efectos
+import ExportButtons from './components/ExportButtons'; // bot de export
+import SearchBar from './components/SearchBar'; // Barra de busqueda
 
 
 
 function App() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // lista de prod
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortOption, setSortOption] = useState(""); // e.g. 'price-asc'
@@ -18,11 +19,14 @@ function App() {
   const appRef = useRef();
   
 
- 
+// 2 . FUNCION PARA CARGAR MAS PRODUCTOS (LAZY LOADING)
   const loadMore = () => {
   setVisibleCount(prev => prev + 10);
 };
 
+  //FUNCIONES DE EXPORTACION 
+  // Exportar productos filtrados a JSON y CSV
+  // Exportar productos filtrados a JSON
 
    const exportJSON = () => {
     const dataStr = JSON.stringify(filteredProducts, null, 2);
@@ -35,11 +39,12 @@ function App() {
     URL.revokeObjectURL(url);
     alert('Archivo JSON descargado');
   };
-
+// Exportar productos filtrados a CSV
   const exportCSV = () => {
     if (!filteredProducts.length) return;
 
     const keys = Object.keys(filteredProducts[0]);
+    //construir filas CSV contenido CSV
     const csvRows = [
       keys.join(","), // encabezados
       ...filteredProducts.map(product =>
@@ -107,44 +112,18 @@ function App() {
           Modo {darkMode ? "claro" : "oscuro"}
         </button>
 
-        <input
-          type="text"
-          placeholder="Buscar producto..."
-          className="border rounded px-3 py-2 my-4 w-full max-w-md dark:bg-gray-800 dark:text-white"
-          value={search}
-          onChange={e => setSearch(e.target.value)} //como callback del evento
+        <SearchBar
+        search={search}
+        setSearch={setSearch}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        sortOption={sortOption}
+        setSortOption={setSortOption}
+        uniqueCategories={uniqueCategories}
+        productsLength={products.length}
         />
 
-        {/* Mostrar select solo si hay productos cargados */}
-        {products.length > 0 && (
-
-        <select 
-          className="border rounded px-3 py-2 mr-4 mb-4 dark:bg-gray-800 dark:text-white"
-          value={categoryFilter}
-          onChange={e => setCategoryFilter(e.target.value)} 
-        >
-          {["all",...uniqueCategories].map(cat => (
-            <option key={cat} value={cat}>
-              {cat === "all" ? "Todas las categorías" : cat}
-            </option>
-          ))}
-        </select>
-        )}
-
-        {/* selección para ordenamiento */}
-        <select
-          className="border rounded px-3 py-2 mb-4 dark:bg-gray-800 dark:text-white"
-          value={sortOption}
-          onChange={e => setSortOption(e.target.value)}
-        >
-          <option value="">Ordenar por</option>
-          <option value="price-asc">Precio ascendente</option>
-          <option value="price-desc">Precio descendente</option>
-          <option value="rating-asc">Rating ascendente</option>
-          <option value="rating-desc">Rating descendente</option>
-        </select>
-
-
+       
         <button
           className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2 rounded mb-4 shadow"
           onClick={() => setShowStats(!showStats)}
