@@ -2,7 +2,7 @@ import axios from 'axios';
 import './App.css';
 import StatsPanel from './components/StatsPanel.jsx';
 import ProductList from './components/ProductList';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import ExportButtons from './components/ExportButtons';
 
 
@@ -15,6 +15,8 @@ function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showStats, setShowStats] = useState(false);
   const [visibleCount, setVisibleCount] = useState(10);
+  const appRef = useRef();
+  
 
  
   const loadMore = () => {
