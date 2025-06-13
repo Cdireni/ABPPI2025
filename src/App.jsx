@@ -69,10 +69,9 @@ function App() {
   };
 
     useEffect(() => {
-    axios.get('https://dummyjson.com/products?=limit=100') // api de products
-      .then(res => res.json())
-      .then(data => setProducts(data.products))
-      .catch(err => console.error('Error fetching products:', err));
+   axios.get('https://dummyjson.com/products?limit=100')
+  .then(res => setProducts(res.data.products)) // ✅ Axios ya devuelve JSON
+  .catch(err => console.error('Error fetching products:', err));
   }, []);
 
   //extraer categorías únicas
@@ -96,7 +95,7 @@ function App() {
   } else if (sortOption === "rating-desc") {
     filteredProducts.sort((a, b) => b.rating - a.rating);
   }
-  //azy loading
+  //lazy loading
   const visibleProducts = filteredProducts.slice(0, visibleCount);
 
  
